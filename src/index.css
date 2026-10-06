@@ -1,0 +1,231 @@
+@import "tailwindcss";
+@import "./cv.css";
+
+@theme {
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Fraunces", Georgia, serif;
+  --color-ink: #1a1614;
+  --color-paper: #f3eee4;
+  --color-stone: #e4dccf;
+  --color-clay: #c45c26;
+  --color-clay-dark: #9a451c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-paper);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.app-shell {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(1200px 500px at 10% -10%, rgba(196, 92, 38, 0.08), transparent 55%),
+    radial-gradient(900px 420px at 100% 0%, rgba(29, 53, 87, 0.08), transparent 50%),
+    var(--color-paper);
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(340px, 420px) 1fr;
+  min-height: 0;
+  flex: 1;
+}
+
+.editor-panel {
+  border-right: 1px solid rgba(26, 22, 20, 0.08);
+  background: rgba(247, 243, 236, 0.9);
+  overflow: auto;
+}
+
+.preview-panel {
+  min-height: 0;
+  height: 100%;
+  overflow: auto;
+  padding: 28px 24px 64px;
+}
+
+
+.input {
+  width: 100%;
+  border: 1px solid rgba(26, 22, 20, 0.12);
+  background: #fff;
+  color: var(--color-ink);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--color-clay);
+  box-shadow: 0 0 0 3px rgba(196, 92, 38, 0.16);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 88px;
+  line-height: 1.45;
+}
+
+@media (max-width: 1080px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-panel {
+    border-right: 0;
+    border-bottom: 1px solid rgba(26, 22, 20, 0.08);
+    max-height: 52vh;
+  }
+}
+
+#vita-print-root {
+  display: none;
+}
+
+body.vita-printing {
+  background: #fff;
+}
+
+body.vita-printing #root {
+  display: none !important;
+}
+
+body.vita-printing #vita-print-root {
+  display: block;
+}
+
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  body.vita-printing #root,
+  body.vita-printing .app-chrome {
+    display: none !important;
+  }
+
+  body.vita-printing #vita-print-root {
+    display: block !important;
+  }
+
+  body:not(.vita-printing) .app-chrome,
+  body:not(.vita-printing) .editor-panel,
+  body:not(.vita-printing) .preview-toolbar {
+    display: none !important;
+  }
+
+  body:not(.vita-printing) .workspace,
+  body:not(.vita-printing) main,
+  body:not(.vita-printing) .preview-panel {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .cv-page,
+  .cv-inner {
+    width: 210mm !important;
+    max-width: 100% !important;
+    min-height: 297mm !important;
+    height: auto !important;
+    zoom: 1 !important;
+    transform: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  .noir,
+  .lumen,
+  .editorial {
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  .noir {
+    display: block !important;
+    background-image: linear-gradient(
+      to right,
+      var(--cv-accent, #1d3557) 62mm,
+      #ffffff 62mm
+    ) !important;
+  }
+
+  .noir-rail {
+    display: none !important;
+  }
+
+  .noir-side {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 62mm !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  .noir-main {
+    display: block !important;
+    margin-left: 62mm !important;
+    width: auto !important;
+    min-height: 0 !important;
+    padding: 11mm 10mm 10mm !important;
+  }
+
+  .lumen-grid {
+    display: block !important;
+  }
+
+  article,
+  section,
+  .cv-keep,
+  .editorial-row,
+  .lumen-top {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  .cv-job-head,
+  h1,
+  h2 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+}
