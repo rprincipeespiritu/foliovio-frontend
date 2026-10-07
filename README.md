@@ -36,7 +36,7 @@ Los tipos del cliente están en `src/contracts/api.d.ts`. Son una copia del cont
 
 ## Ramas y Railway
 
-Trabajamos en `dev`. Los cambios aprobados pasarán mediante un PR de `dev` a `prd`; el servicio de producción en Railway deberá seguir únicamente `prd`. Este trabajo prepara los archivos, sin realizar todavía el pase ni el despliegue.
+Trabajamos en `dev` y publicamos desde `prd`. La primera versión de producción parte de `dev`; los siguientes cambios pasan mediante un PR de `dev` a `prd`. Configura el servicio de Railway para seguir únicamente `prd` y esperar al CI. La guía enlazada más abajo detalla la configuración inicial del proyecto.
 
 `Dockerfile` compila la aplicación y Caddy sirve `dist/` en producción. `railway.json` usa ese Dockerfile y verifica `/healthz`. Caddy hace fallback a `index.html` y reenvía `/api` al backend indicado por `API_UPSTREAM`, conservando la ruta y las cookies.
 
