@@ -18,7 +18,7 @@ const MESSAGES = {
 export default function App() {
   const pageRef = useRef<HTMLDivElement>(null)
   const { data, importData } = useCV()
-  const { user, recordExport, activateLocal, logout, refresh } = useAuth()
+  const { user, loading, recordExport, activateLocal, logout, refresh } = useAuth()
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -137,7 +137,8 @@ export default function App() {
         onExport={() => void handleExport()}
         onUnlock={() => (user ? setPaywallOpen(true) : setAuthOpen(true))}
         onAuth={() => setAuthOpen(true)}
-        onLogout={() => void logout()}
+        loadingAccount={loading}
+        onLogout={logout}
         onImportFile={(file) => void handleImportFile(file)}
       />
       {error ? (

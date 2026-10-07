@@ -1,0 +1,9 @@
+.git
+.github
+node_modules
+dist
+.npm-cache
+.env
+.env.*
+*.log
+*.tsbuildinfo

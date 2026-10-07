@@ -34,17 +34,18 @@ La interfaz consulta el usuario y su plan mediante `/api/auth/me`. Las rutas `/a
 
 Los tipos del cliente están en `src/contracts/api.d.ts`. Son una copia del contrato HTTP, sin importaciones al repositorio del backend. Al cambiar la API, mantén compatibilidad o actualiza esta copia y el cliente HTTP de `src/api.ts`. La implementación del backend es la fuente de las reglas de suscripción.
 
-## Despliegue
+## Ramas y Railway
 
-1. Clona únicamente este repositorio e instala con `npm ci`.
-2. Configura `VITE_API_URL` y las demás variables públicas antes de `npm run build`.
-3. Publica `dist/` en un hosting estático con fallback de navegación a `index.html`.
-4. También puedes dejar `VITE_API_URL` vacío y configurar un proxy del hosting desde `/api` al backend. El proxy de Vite solo aplica al desarrollo y a `preview`.
+Trabajamos en `dev`. Los cambios aprobados pasarán mediante un PR de `dev` a `prd`; el servicio de producción en Railway deberá seguir únicamente `prd`. Este trabajo prepara los archivos, sin realizar todavía el pase ni el despliegue.
 
-Usa HTTPS y, preferentemente, el mismo sitio para frontend y API. Las cookies entre sitios distintos dependen de la configuración del backend y de las restricciones del navegador. Este repositorio dispone de su propio workflow de CI, lockfile y configuración Git.
+`Dockerfile` compila la aplicación y Caddy sirve `dist/` en producción. `railway.json` usa ese Dockerfile y verifica `/healthz`. Caddy hace fallback a `index.html` y reenvía `/api` al backend indicado por `API_UPSTREAM`, conservando la ruta y las cookies.
+
+La imagen fija `VITE_API_URL` vacío para usar ese proxy del mismo origen. `API_UPSTREAM` es una variable del servidor en ejecución, por ejemplo `http://backend.railway.internal:3001`; nunca se envía al navegador. Precio y enlaces públicos `VITE_*` se configuran al compilar mediante los argumentos declarados en el Dockerfile. Para el desarrollo con Vite se mantiene la configuración habitual de `.env.example`.
+
+Consulta [la guía de Railway](docs/railway.md). No uses `vite preview` como servidor de producción.
 
 ## Procedencia y datos
 
-Extraído del estado local de `dev` de Foliovio el 6 de octubre de 2026, incluyendo la separación de suscripciones realizada después del commit `c3c8f24`. El historial original permanece en el repositorio `foliovio`; este repositorio inicia su propia historia. No se copiaron secretos, bases de datos ni artefactos compilados.
+Extraído del estado local de `dev` de Foliovio el 6 de octubre de 2026, incluyendo la separación de suscripciones realizada después del commit `c3c8f24`. Este repositorio mantiene su propia historia. No se copiaron secretos, bases de datos ni artefactos compilados.
 
 El CV sigue almacenándose en el navegador; no hay almacenamiento remoto de CV por usuario. La impresión es del lado del cliente. El acceso Pro y el consumo se verifican en el backend antes del flujo normal de exportación.
