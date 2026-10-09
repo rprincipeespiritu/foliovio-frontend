@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from './auth'
 import { AuthModal } from './components/AuthModal'
+import { EmailVerification } from './components/EmailVerification'
 import { Editor } from './components/Editor'
 import { Paywall } from './components/Paywall'
 import { Preview } from './components/Preview'
@@ -26,7 +27,16 @@ export default function App() {
   const [dragOver, setDragOver] = useState(false)
   const [paywallOpen, setPaywallOpen] = useState(false)
   const [authOpen, setAuthOpen] = useState(false)
+  const [authMode, setAuthMode] = useState<'login' | 'resend'>('login')
+  const [verificationToken, setVerificationToken] = useState<string | null>(() => new URLSearchParams(window.location.hash.slice(1)).get('verify-email'))
   const [pendingExport, setPendingExport] = useState(false)
+
+  useEffect(() => {
+    if (verificationToken !== null) {
+      // Keep the token only in memory, out of history and subsequent copied URLs.
+      window.history.replaceState({}, '', `${window.location.pathname}${window.location.search}`)
+    }
+  }, [verificationToken])
 
   useEffect(() => {
     if (!pendingExport || !user) return
@@ -160,14 +170,22 @@ export default function App() {
           <p className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-paper">Elige Guardar como PDF…</p>
         </div>
       ) : null}
-      <AuthModal
+      {authOpen && <AuthModal
+        initialMode={authMode}
         open={authOpen}
         onClose={() => {
           setAuthOpen(false)
+          setAuthMode('login')
           setPendingExport(false)
         }}
         onSuccess={handleAuthSuccess}
-      />
+      />}
+      {verificationToken !== null && <EmailVerification
+        token={verificationToken}
+        onClose={() => setVerificationToken(null)}
+        onLogin={() => { setVerificationToken(null); setAuthMode('login'); setAuthOpen(true) }}
+        onResend={() => { setVerificationToken(null); setAuthMode('resend'); setAuthOpen(true) }}
+      />}
       {paywallOpen ? (
         <Paywall
           open={paywallOpen}

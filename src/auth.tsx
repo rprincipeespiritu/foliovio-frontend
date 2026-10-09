@@ -8,13 +8,14 @@ import {
   registerAccount,
   type AuthUser,
 } from './api'
+import type { RegistrationResult } from './contracts/api'
 
 interface AuthContextValue {
   user: AuthUser | null
   loading: boolean
   refresh: () => Promise<void>
   login: (email: string, password: string) => Promise<void>
-  register: (email: string, password: string, name: string) => Promise<void>
+  register: (email: string, password: string, name: string) => Promise<RegistrationResult>
   logout: () => Promise<void>
   recordExport: () => Promise<AuthUser>
   activateLocal: () => Promise<void>
@@ -51,8 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(result.user)
       },
       register: async (email, password, name) => {
-        const result = await registerAccount(email, password, name)
-        setUser(result.user)
+        return registerAccount(email, password, name)
       },
       logout: async () => {
         await logoutAccount()

@@ -1,7 +1,12 @@
-import type { AuthUser, Subscription } from './contracts/api'
+import type { AuthUser, Subscription, RegistrationResult } from './contracts/api'
 export type { AuthUser, Subscription } from './contracts/api'
 
 const apiUrl = (import.meta.env.VITE_API_URL?.trim() || '').replace(/\/+$/, '')
+
+export class ApiError extends Error {
+  code?: string
+  constructor(message: string, code?: string) { super(message); this.code = code }
+}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${apiUrl}${path}`, {
@@ -12,9 +17,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       ...(init?.headers ?? {}),
     },
   })
-  const data = (await response.json().catch(() => ({}))) as T & { error?: string }
+  const data = (await response.json().catch(() => ({}))) as T & { error?: string; code?: string }
   if (!response.ok) {
-    throw new Error(data.error || 'No se pudo completar la solicitud.')
+    throw new ApiError(data.error || 'No se pudo completar la solicitud.', data.code)
   }
   return data
 }
@@ -24,7 +29,7 @@ export function fetchMe() {
 }
 
 export function registerAccount(email: string, password: string, name: string) {
-  return request<{ user: AuthUser }>('/api/auth/register', {
+  return request<RegistrationResult>('/api/auth/register', {
     method: 'POST',
     body: JSON.stringify({ email, password, name }),
   })
@@ -47,6 +52,14 @@ export function recordServerExport() {
 
 export function activateLocalPremium() {
   return request<{ user: AuthUser }>('/api/billing/activate', { method: 'POST' })
+}
+
+export function resendVerification(email: string) {
+  return request<{ message: string }>('/api/auth/resend-verification', { method: 'POST', body: JSON.stringify({ email }) })
+}
+
+export function verifyEmail(token: string) {
+  return request<{ ok: boolean; message: string }>('/api/auth/verify-email', { method: 'POST', body: JSON.stringify({ token }) })
 }
 
 export function fetchSubscription() {

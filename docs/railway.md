@@ -25,6 +25,8 @@ En las opciones de origen de cada servicio selecciona `prd` explícitamente; `ra
 
 ## Variables del backend
 
+Para activar las nuevas cuentas por correo, configura en el backend `SENDGRID_API_KEY` (permiso Mail Send), `EMAIL_FROM` (remitente verificado en SendGrid) y opcionalmente `EMAIL_FROM_NAME=Foliovio`. `APP_ORIGIN` debe ser `https://www.foliovio.com` si ese es el dominio público. No agregues estas credenciales al frontend. Antes del pase a prd, configura el remitente y publica el frontend actualizado antes del backend; ambos repositorios cambian el contrato de registro para devolver un estado pendiente en lugar de iniciar sesión.
+
 | Variable | Valor previsto |
 | --- | --- |
 | `NODE_ENV` | `production` (también lo establece la imagen) |
