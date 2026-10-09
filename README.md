@@ -36,6 +36,8 @@ Los tipos del cliente están en `src/contracts/api.d.ts`. Son una copia del cont
 
 ## Ramas y Railway
 
+Paddle Billing usa el SDK oficial `@paddle/paddle-js`. La configuración pública y el precio se consultan al backend en `/api/billing/config`; no necesitas claves `VITE_PADDLE_*`. El checkout usa una transacción creada por el backend para el usuario autenticado. El cuadro mensual explica renovación y cancelación; Mi cuenta permite abrir el portal de pagos. El evento de checkout completado consulta el plan, pero solo el webhook firmado del backend concede Pro. Para activar Paddle configura las cinco variables `PADDLE_*` siguiendo `docs/paddle.md` del backend. Si Paddle está habilitado tiene prioridad sobre el checkout anterior y los enlaces manuales. Mantén `VITE_PRICE` alineado con el precio comercial del producto.
+
 El registro nuevo requiere activación por correo. La interfaz muestra el estado pendiente, ofrece reenviar el enlace y procesa `/#verify-email=TOKEN` con confirmación manual. Después de confirmar, el usuario inicia sesión con su contraseña. Las credenciales de SendGrid se configuran únicamente en el backend (`SENDGRID_API_KEY`, `EMAIL_FROM`, `EMAIL_FROM_NAME`); el frontend no envía correos. `APP_ORIGIN` en el backend debe coincidir con el dominio público del frontend para generar los enlaces.
 
 Trabajamos en `dev` y publicamos desde `prd`. La primera versión de producción parte de `dev`; los siguientes cambios pasan mediante un PR de `dev` a `prd`. Configura el servicio de Railway para seguir únicamente `prd` y esperar al CI. La guía enlazada más abajo detalla la configuración inicial del proyecto.

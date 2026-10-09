@@ -5,7 +5,8 @@ const apiUrl = (import.meta.env.VITE_API_URL?.trim() || '').replace(/\/+$/, '')
 
 export class ApiError extends Error {
   code?: string
-  constructor(message: string, code?: string) { super(message); this.code = code }
+  status?: number
+  constructor(message: string, code?: string, status?: number) { super(message); this.code = code; this.status = status }
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -19,7 +20,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   })
   const data = (await response.json().catch(() => ({}))) as T & { error?: string; code?: string }
   if (!response.ok) {
-    throw new ApiError(data.error || 'No se pudo completar la solicitud.', data.code)
+    throw new ApiError(data.error || 'No se pudo completar la solicitud.', data.code, response.status)
   }
   return data
 }
@@ -65,3 +66,8 @@ export function verifyEmail(token: string) {
 export function fetchSubscription() {
   return request<{ subscription: Subscription }>('/api/billing/subscription')
 }
+
+export type PaddleConfig = { enabled: false } | { enabled: true; environment: 'sandbox' | 'production'; clientToken: string; price: string }
+export function fetchPaddleConfig() { return request<PaddleConfig>('/api/billing/config') }
+export function createPaddleCheckout() { return request<{ transactionId: string }>('/api/billing/checkout', { method: 'POST' }) }
+export function createBillingPortal() { return request<{ url: string }>('/api/billing/portal', { method: 'POST' }) }

@@ -4,6 +4,7 @@ import { AuthModal } from './components/AuthModal'
 import { EmailVerification } from './components/EmailVerification'
 import { Editor } from './components/Editor'
 import { Paywall } from './components/Paywall'
+import { PaddleStatus } from './components/PaddleStatus'
 import { Preview } from './components/Preview'
 import { TopBar } from './components/TopBar'
 import { fileNameFrom } from './lib'
@@ -170,6 +171,7 @@ export default function App() {
           <p className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-paper">Elige Guardar como PDF…</p>
         </div>
       ) : null}
+      <PaddleStatus />
       {authOpen && <AuthModal
         initialMode={authMode}
         open={authOpen}
@@ -191,6 +193,7 @@ export default function App() {
           open={paywallOpen}
           email={user?.email}
           onClose={() => setPaywallOpen(false)}
+          onAuth={() => { setPaywallOpen(false); setAuthOpen(true) }}
           onUnlockLocal={import.meta.env.DEV ? () => void handleUnlockLocal() : undefined}
         />
       ) : null}

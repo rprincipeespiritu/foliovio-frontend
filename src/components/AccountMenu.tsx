@@ -1,6 +1,7 @@
 import { LogIn, LogOut, UserRound } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import type { AuthUser } from '../api'
+import { createBillingPortal } from '../api'
 
 interface AccountMenuProps {
   user: AuthUser | null
@@ -13,6 +14,8 @@ export function AccountMenu({ user, loading, onAuth, onLogout }: AccountMenuProp
   const [open, setOpen] = useState(false)
   const [confirming, setConfirming] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
+  const [openingPortal, setOpeningPortal] = useState(false)
+  const [portalError, setPortalError] = useState('')
   const [error, setError] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
   const avatarRef = useRef<HTMLButtonElement>(null)
@@ -107,6 +110,21 @@ export function AccountMenu({ user, loading, onAuth, onLogout }: AccountMenuProp
               <span className="mt-3 inline-block rounded-full bg-clay/10 px-2.5 py-1 text-xs font-semibold text-clay-dark">
                 {user.premium ? 'Foliovio Pro' : 'Plan gratuito'}
               </span>
+              {user.subscription.currentPeriodEnd > 0 && <p className="mt-2 text-xs text-ink/65">
+                {user.subscription.cancelAtPeriodEnd ? 'Cancelación programada: ' : 'Fin del período: '}
+                {new Date(user.subscription.currentPeriodEnd).toLocaleDateString('es-PE')}
+              </p>}
+              {user.subscription.status === 'past_due' && <p className="mt-2 text-xs text-clay-dark">Pago pendiente. Actualiza tu método de pago para recuperar Pro.</p>}
+              {user.subscription.provider === 'paddle' && <>
+                <button type="button" disabled={signingOut} aria-disabled={openingPortal || signingOut} className="mt-3 w-full rounded-full border border-ink/20 px-3 py-2 text-sm disabled:opacity-60" onClick={async () => {
+                  if (openingPortal) return
+                  setOpeningPortal(true)
+                  setPortalError('')
+                  try { const { url } = await createBillingPortal(); window.location.assign(url) }
+                  catch (caught) { setPortalError(caught instanceof Error ? caught.message : 'No se pudo abrir el portal.'); setOpeningPortal(false) }
+                }}>{openingPortal ? 'Abriendo portal…' : 'Gestionar suscripción y pagos'}</button>
+                {portalError && <p role="alert" className="mt-2 text-xs text-clay-dark">{portalError}</p>}
+              </>}
             </div>
           ) : (
             <div className="mt-3">
