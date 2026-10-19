@@ -23,7 +23,7 @@ Para usar un backend remoto, configura `VITE_API_URL=https://api.ejemplo.com`, s
 | `npm run dev` | Servidor de desarrollo en el puerto 5173 |
 | `npm run build` | Validar TypeScript y generar `dist/` |
 | `npm run preview` | Revisar `dist/` en el puerto 5173, con proxy local al backend |
-| `npm test` | Prueba de importación de currículums |
+| `npm test` | Pruebas de importación de currículums y caducidad por inactividad |
 | `npm run lint` | Análisis estático del frontend |
 
 ## Configuración
@@ -35,6 +35,18 @@ La interfaz consulta el usuario y su plan mediante `/api/auth/me`. Las rutas `/a
 Los tipos del cliente están en `src/contracts/api.d.ts`. Son una copia del contrato HTTP, sin importaciones al repositorio del backend. Al cambiar la API, mantén compatibilidad o actualiza esta copia y el cliente HTTP de `src/api.ts`. La implementación del backend es la fuente de las reglas de suscripción.
 
 ## Ramas y Railway
+
+La sesión se cierra tras 10 minutos sin interacción (teclado, puntero, rueda o
+toque), con un aviso para volver a entrar y sin borrar el currículum guardado.
+La actividad se comunica al backend como máximo una vez cada 10 segundos;
+el tiempo entre la interacción y el envío no renueva artificialmente la sesión.
+Las consultas automáticas, el foco y recargar la página no reinician el plazo.
+Al volver de una pestaña suspendida se comprueba el tiempo transcurrido.
+Las pestañas del mismo origen comparten actividad y cierre para la misma sesión;
+si el almacenamiento está deshabilitado se conserva la caducidad en memoria.
+El backend aplica también el límite, incluso si el navegador está desconectado.
+Desplegar con la migración 4 del backend: las sesiones antiguas requieren otro
+inicio de sesión y no hay variables de entorno nuevas.
 
 Paddle Billing usa el SDK oficial `@paddle/paddle-js`. La configuración pública y el precio se consultan al backend en `/api/billing/config`; no necesitas claves `VITE_PADDLE_*`. El checkout usa una transacción creada por el backend para el usuario autenticado. El cuadro mensual explica renovación y cancelación; Mi cuenta permite abrir el portal de pagos. El evento de checkout completado consulta el plan, pero solo el webhook firmado del backend concede Pro. Para activar Paddle configura las cinco variables `PADDLE_*` siguiendo `docs/paddle.md` del backend. Si Paddle está habilitado tiene prioridad sobre el checkout anterior y los enlaces manuales. Mantén `VITE_PRICE` alineado con el precio comercial del producto.
 

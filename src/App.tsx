@@ -20,7 +20,7 @@ const MESSAGES = {
 export default function App() {
   const pageRef = useRef<HTMLDivElement>(null)
   const { data, importData } = useCV()
-  const { user, loading, recordExport, activateLocal, logout, refresh } = useAuth()
+  const { user, loading, sessionNotice, recordExport, activateLocal, logout, refresh } = useAuth()
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -157,6 +157,12 @@ export default function App() {
       ) : null}
       {notice ? (
         <p className="app-chrome bg-ink/5 px-4 py-2 text-center text-sm text-ink/70">{notice}</p>
+      ) : null}
+      {sessionNotice ? (
+        <p role="status" className="app-chrome bg-clay/10 px-4 py-2 text-center text-sm text-clay-dark">
+          {sessionNotice}{' '}
+          <button className="font-semibold underline" onClick={() => { setAuthMode('login'); setAuthOpen(true) }}>Entrar</button>
+        </p>
       ) : null}
       <div className="workspace">
         <aside className="editor-panel">

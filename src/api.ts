@@ -1,5 +1,6 @@
 import type { AuthUser, Subscription, RegistrationResult } from './contracts/api'
 export type { AuthUser, Subscription } from './contracts/api'
+export interface SessionInfo { id: string; remainingMs: number }
 
 const apiUrl = (import.meta.env.VITE_API_URL?.trim() || '').replace(/\/+$/, '')
 
@@ -26,7 +27,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export function fetchMe() {
-  return request<{ user: AuthUser | null }>('/api/auth/me')
+  return request<{ user: AuthUser | null; session: SessionInfo | null }>('/api/auth/me')
 }
 
 export function registerAccount(email: string, password: string, name: string) {
@@ -37,14 +38,18 @@ export function registerAccount(email: string, password: string, name: string) {
 }
 
 export function loginAccount(email: string, password: string) {
-  return request<{ user: AuthUser }>('/api/auth/login', {
+  return request<{ user: AuthUser; session: SessionInfo }>('/api/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   })
 }
 
-export function logoutAccount() {
-  return request<{ ok: boolean }>('/api/auth/logout', { method: 'POST' })
+export function logoutAccount(sessionId?: string) {
+  return request<{ ok: boolean }>('/api/auth/logout', { method: 'POST', body: JSON.stringify({ sessionId }) })
+}
+
+export function reportActivity(sessionId: string, idleMs: number) {
+  return request<{ session: SessionInfo }>('/api/auth/activity', { method: 'POST', body: JSON.stringify({ sessionId, idleMs }) })
 }
 
 export function recordServerExport() {
